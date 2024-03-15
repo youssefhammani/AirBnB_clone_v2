@@ -1,35 +1,55 @@
-# Ensure Nginx is installed
-package { 'nginx':
-  ensure => installed,
-}
+# Define a class for setting up web static content
+class setup_web_static {
+  
+  # Create necessary directories
+  file { '/data':
+    ensure => 'directory',
+    owner  => 'ubuntu',
+    group  => 'ubuntu',
+    mode   => '0755',
+  }
 
-# Create directory structure
-file { ['/data/web_static', '/data/web_static/releases', '/data/web_static/shared']:
-  ensure => directory,
-}
+  file { '/data/web_static':
+    ensure => 'directory',
+    owner  => 'ubuntu',
+    group  => 'ubuntu',
+    mode   => '0755',
+  }
 
-# Create symbolic link
-file { '/data/web_static/current':
-  ensure => 'link',
-  target => '/data/web_static/releases/test',
-  force  => true,
-}
+  file { '/data/web_static/releases':
+    ensure => 'directory',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+  }
 
-# Create index.html file
-file { '/data/web_static/releases/test/index.html':
-  ensure  => file,
-  content => '<html>
+  file { '/data/web_static/shared':
+    ensure => 'directory',
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+  }
+
+  # Create symbolic link
+  file { '/data/web_static/current':
+    ensure => 'link',
+    target => '/data/web_static/releases/test',
+    owner  => 'root',
+    group  => 'root',
+  }
+
+  # Create index.html file
+  file { '/data/web_static/releases/test/index.html':
+    ensure  => 'file',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0644',
+    content => '<html>
   <head>
   </head>
   <body>
     Holberton School
   </body>
 </html>',
-}
-
-# Restart Nginx
-service { 'nginx':
-  ensure    => running,
-  enable    => true,
-  subscribe => File['/etc/nginx/sites-available/default'],
+  }
 }
